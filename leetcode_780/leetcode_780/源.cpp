@@ -10,70 +10,103 @@
 
 typedef struct NODE {
 	int x, y;
-}Node;
+	struct NODE *next;
+}Node, *pNode;
 
-void push(Node *stack, Node node, int *top, int MAX)
+pNode insert(pNode head, pNode tail, pNode node)	//¸³Öµ¸øtail
 {
-	if (*top == MAX) {
-		return;
+	if (head->next == NULL) {
+		head->next = node;
+		node->next = NULL;
+		return node;
 	}
-	stack[*top] = node;
-	*top = *top + 1;
+	tail->next = node;
+	node->next = NULL;
+	return node;
 }
 
-Node pop(Node *stack, int *top)
-{
-	Node temp;
-	if (*top == 0) {
-		temp.x = -1;
-		temp.y = -1;
-		return temp;
-	}
-	*top = *top - 1;
-	return stack[*top];
+pNode get(pNode head) {
+	pNode temp;
+	if (head->next != NULL) temp = head->next;
+	else return NULL;
+	head->next = head->next->next;
+	return temp;
 }
 
-bool reachingPoints(int sx, int sy, int tx, int ty)
+void freeNodes(pNode head) {
+	pNode realese, temp;
+	temp = head->next;
+	while (temp != NULL) {
+		realese = temp;
+		temp = temp->next;
+		free(realese);
+	}
+}
+
+pNode NewNode(int x, int y, pNode next)
 {
-	int MAX = ((tx > ty) ? tx : ty) / ((sx > sy) ? sy : sx);
-	Node *stack = (Node *)malloc(MAX * sizeof(Node));
-	int top = 0;
-	Node node;
-	node.x = sx;
-	node.y = sy;
-	push(stack, node, &top, MAX);
-	while (1) {
-		while (1) {
-			if (node.x == tx && node.y == ty) {
+	pNode node = (pNode)malloc(sizeof(Node));
+	node->x = x;
+	node->y = y;
+	node->next = next;
+	return node;
+}
+bool reachingPoints(int sx, int sy, int tx, int ty) {
+	if (sx > tx || sy > ty) {
+		return false;
+	}
+	Node head;
+	head.next = NULL;
+	pNode tail = &head, node, current;
+	node = NewNode(tx, ty, NULL);
+	tail = insert(&head, tail, node);
+	while (head.next != NULL) {
+		current = get(&head);
+		if (current->y == sy && current->x == sx) {
+			freeNodes(&head);
+			return true;
+		}
+		if (current->x == sx) {
+			if ((current->y - sy) % current->x == 0 && (current->y - sy) >= current->x) {
+				freeNodes(&head);
 				return true;
 			}
-			if (node.x <= tx - node.y) {
-				node.x = node.x + node.y;
-				push(stack, node, &top, MAX);
-			}
 			else {
-				break;
-			}
-		}
-		while (1) {
-			node = pop(stack, &top);
-			if (node.x == -1) {
 				return false;
 			}
-			if (node.y <= ty - node.x) {
-				node.y = node.x + node.y;
-				push(stack, node, &top, MAX);
-				break;
+		}
+		if (current->y == sy) {
+			if ((current->x - sx) % current->y == 0 && (current->x - sx) >= current->y) {
+				freeNodes(&head);
+				return true;
+			}
+			else {
+				return false;
 			}
 		}
+		if (current->x - current->y >= sx) {
+			node = NewNode(current->x - current->y, current->y, NULL);
+			tail = insert(&head, tail, node);
+		}
+		if (current->y - current->x >= sy) {
+			current->y = current->y - current->x;
+			current->next = NULL;
+			tail = insert(&head, tail, current);
+		}
+		else {
+			free(current);
+		}
 	}
+	freeNodes(&head);
 	return false;
 }
 
 int main()
 {
-	printf("%d\n", reachingPoints(31, 13, 3234231, 5243131));
-	printf("%d\n", reachingPoints(1, 1, 3, 5));
+	printf("%d\n", reachingPoints(3, 3, 12, 9));
+	printf("%d\n", reachingPoints(4, 2, 2, 4));
+	printf("%d\n", reachingPoints(1, 5, 19, 5));
+	printf("%d\n", reachingPoints(31, 11, 3234231, 5323423));
 	system("pause");
 	return 0;
 }
