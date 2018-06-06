@@ -10,7 +10,6 @@
 
 typedef struct NODE {
 	int x, y;
-	unsigned char flag;
 }Node;
 
 void push(Node *stack, Node node, int *top, int MAX)
@@ -42,32 +41,18 @@ bool reachingPoints(int sx, int sy, int tx, int ty)
 	Node node;
 	node.x = sx;
 	node.y = sy;
-	node.flag = 1;
 	push(stack, node, &top, MAX);
 	while (1) {
 		while (1) {
 			if (node.x == tx && node.y == ty) {
 				return true;
 			}
-			if (node.flag) {
-				if (node.x <= tx - node.y) {
-					node.x = node.x + node.y;
-					node.flag = 0;
-					push(stack, node, &top, MAX);
-				}
-				else {
-					break;
-				}
+			if (node.x <= tx - node.y) {
+				node.x = node.x + node.y;
+				push(stack, node, &top, MAX);
 			}
 			else {
-				if (node.y <= ty - node.x) {
-					node.y = node.x + node.y;
-					node.flag = 1;
-					push(stack, node, &top, MAX);
-				}
-				else {
-					break;
-				}
+				break;
 			}
 		}
 		while (1) {
@@ -75,19 +60,10 @@ bool reachingPoints(int sx, int sy, int tx, int ty)
 			if (node.x == -1) {
 				return false;
 			}
-			if (node.flag) {
-				if (node.y <= ty - node.x) {
-					node.y = node.x + node.y;
-					push(stack, node, &top, MAX);
-					break;
-				}
-			}
-			else {
-				if (node.x <= tx - node.y) {
-					node.x = node.x + node.y;
-					push(stack, node, &top, MAX);
-					break;
-				}
+			if (node.y <= ty - node.x) {
+				node.y = node.x + node.y;
+				push(stack, node, &top, MAX);
+				break;
 			}
 		}
 	}
@@ -96,7 +72,7 @@ bool reachingPoints(int sx, int sy, int tx, int ty)
 
 int main()
 {
-	printf("%d\n", reachingPoints(31, 13, 323423, 524313));
+	printf("%d\n", reachingPoints(31, 13, 3234231, 5243131));
 	printf("%d\n", reachingPoints(1, 1, 3, 5));
 	system("pause");
 	return 0;
