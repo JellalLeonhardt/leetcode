@@ -72,6 +72,7 @@ void freeNodes(pNode head) {
 		free(realese);
 	}
 }
+
 int run2goal(char board[6], char target_board[6], char path_mark[6][6][6][6][6][6], int zero_row, int zero_col, int *steps, int step)
 {
 
