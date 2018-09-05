@@ -1,30 +1,33 @@
 #include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <Windows.h>
 
 char* shortestPalindrome(char* s) {
-	char *max_position = s;
-	char *p = s;
-	char *tmp0, *tmp1;
-	while (*(p++) != '\0') {
-		if (*p == *s) {
-			tmp0 = s;
-			tmp1 = p;
-			while (*(tmp0++) == *(tmp1--)) {
-				if (tmp0 > tmp1) {
-					max_position = p;
-				}
-			}
+	if (s == NULL) return NULL;
+	int len = strlen(s);
+	char *result = (char *)malloc(sizeof(char) * (len * 2 + 1));
+	char *p = s + len - 1;
+	int cnt = 1;
+	result[0] = *p;
+	while (p-- > s) {
+		result[cnt++] = *p;
+	}
+	result[cnt] = 0;
+	int i;
+	for (i = 0; result[i] != 0; i++) {
+		if (strncmp(&result[i], s, cnt - i) == 0) {
+			break;
 		}
 	}
-	p = p - 2;
-	int len = p - max_position + p - s + 2;
-	int cnt = 0;
-	char *result = (char *)malloc(sizeof(char) * len);
-	for (tmp1 = p; tmp1 > max_position; tmp1--) {
-		result[cnt++] = *tmp1;
-	}
-	for (tmp0 = s; tmp0 <= p; tmp0++) {
-		result[cnt++] = *tmp0;
-	}
-	result[cnt++] = 0;//foolish me
+	p = s + cnt - i;
+	strcpy(&result[cnt], p);
+	result[len + i] = 0;
 	return result;
+}
+
+int main() {
+	printf("%s\n", shortestPalindrome("abacde"));
+	system("pause");
+	return 0;
 }
