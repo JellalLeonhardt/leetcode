@@ -26,7 +26,7 @@ int Init()
 
 int Manacher()
 {
-	int len = Init();  // 取得新字符串长度并完成向 s_new 的转换
+	int len = Init();  // 取得新字符串长度并完成向 并插入$#
 	int max_len = -1;  // 最长回文长度
 
 	int id;
