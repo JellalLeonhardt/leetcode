@@ -82,7 +82,7 @@ int compare(char *from, char* to) {
 
 int minMutation(char* start, char* end, char** bank, int bankSize)
 {
-	int *mark = (int *)malloc(sizeof(int) * bankSize);
+	int *mark = (int *)malloc(sizeof(int) * bankSize); //mark用于标记是否走过
 	memset(mark, 0, sizeof(int) * bankSize);
 	int i, min = INT_MAX, target;
 	Node head;
@@ -110,6 +110,7 @@ int minMutation(char* start, char* end, char** bank, int bankSize)
 					else {
 						node = NewNode(bank[i], node->cnt + 1, NULL);
 						tail = insert(&head, tail, node);
+						mark[i] = 1;
 					}
 				}
 			}
@@ -121,18 +122,18 @@ int minMutation(char* start, char* end, char** bank, int bankSize)
 	return -1;
 }
 
-#define BANKSIZE 3
+#define BANKSIZE 8
 
 int main()
 {
-	char start[100] = "AACCGGTT";
-	char end[100] = "AAACGGTA";
-	char bank[BANKSIZE][100] = { "AACCGGTA", "AACCGCTA", "AAACGGTA" };
+	char start[9] = "AAAACCCC";
+	char end[9] = "CCCCCCCC";
+	char bank[BANKSIZE][9] = { "AAAACCCA","AAACCCCA","AACCCCCA","AACCCCCC","ACCCCCCC","CCCCCCCC","AAACCCCC","AACCCCCC" };
 	char **BANK = (char **)malloc(sizeof(char *) * BANKSIZE);
 	int i;
 	for (i = 0; i < BANKSIZE; i++) {
-		BANK[i] = (char *)malloc(sizeof(char) * 100);
-		memcpy(BANK[i], bank[i], 100);
+		BANK[i] = (char *)malloc(sizeof(char) * 9);
+		memcpy(BANK[i], bank[i], 9);
 	}
 	printf("%d\n", minMutation(start, end, BANK, BANKSIZE));
 	system("pause");
