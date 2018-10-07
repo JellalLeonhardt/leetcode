@@ -1,131 +1,47 @@
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <limits.h>
-#include <Windows.h>
-
-typedef struct NODE {
-	char *str;
-	int cnt;
-	int *mark;
-	struct NODE *next;
-}Node, *pNode;
-
-pNode insert(pNode head, pNode tail, pNode node)	//赋值给tail
-{
-	if (head->next == NULL) {
-		head->next = node;
-		node->next = NULL;
-		return node;
+int connect(char* a, char* b) {	//判断是不是只有一个不同
+	int i, c = 0;
+	for (i = 0; a[i] != '\0'; i++) {
+		if (a[i] != b[i])c++;
 	}
-	tail->next = node;
-	node->next = NULL;
-	return node;
+	if (c == 1) return 1;
+	else return 0;
 }
-
-pNode get(pNode head) {
-	pNode temp;
-	if (head->next != NULL) temp = head->next;
-	else return NULL;
-	head->next = head->next->next;
-	return temp;
-}
-
-void freeNodes(pNode head) {
-	pNode realese, temp;
-	temp = head->next;
-	while (temp != NULL) {
-		realese = temp;
-		temp = temp->next;
-		free(realese->mark);
-		free(realese);
+int minMutation(char* start, char* end, char** bank, int bankSize) {
+	if (bankSize == 0)return -1;
+	int dist[bankSize];
+	int flag = 0, end_lab;;
+	for (int i = 0; i<bankSize; i++) {
+		if ((!flag) && strcmp(bank[i], end) == 0) {
+			end_lab = i;
+			flag = 1;
+		}
 	}
-}
+	if (flag == 0)return -1;
+	memset(dist, bankSize + 1, sizeof(dist)); //这个地方实际的dist[i]可能会远大于bankSize 不过并不影响什么
+	int q[bankSize], head = 0, tail = 0; //q为不带循环的静态队列，因为大小可确定
+	for (int i = 0; i<bankSize; i++) {
+		if (connect(start, bank[i]) == 1)
+		{
+			dist[i] = 1;
+			q[tail] = i;
+			tail++;
 
-pNode NewNode(char *str, int cnt, pNode next, int size)
-{
-	pNode node = (pNode)malloc(sizeof(Node));
-	node->str = str;
-	node->cnt = cnt;
-	node->next = next;
-	node->mark = (int *)malloc(size);
-	memset(node->mark, 0, size);
-	return node;
-}
-
-int compare(char *from, char* to) {
-	int i, cnt = 0;
-	for (i = 0; i < 8; i++) {
-		if (from[i] != to[i]) {
-			cnt++;
-			if (cnt > 1) {
-				return 0;
+		}
+	}
+	while (head != tail&&dist[end_lab]>bankSize) {	//因为是广搜，所以我之前担心的会错过更佳的路径其实是没有必要的，只用一个dist足矣
+													//算法上没什么好说的，dist用来记录经过bank[i]时已有的点数，大于bankSize说明没经过
+													//静态队列记录已经经过的点，已经看过的点没必要再看，所以直接head++直到队尾就ok了
+													//内存for循环则是用来寻找当前的q[head]的下一个节点，找到了就加入队尾
+		for (int i = 0; i<bankSize; i++) {
+			if (dist[i]>bankSize&&connect(bank[i], bank[q[head]]) == 1)
+			{
+				dist[i] = 1 + dist[q[head]];
+				q[tail] = i;
+				tail++;
 			}
 		}
+		head++;
 	}
-	if (cnt == 0) {
-		return 0;
-	}
-	return 1;
-}
-
-int minMutation(char* start, char* end, char** bank, int bankSize)
-{
-	int size = sizeof(int) * bankSize;
-	int i, min = INT_MAX, target;
-	Node head;
-	head.next = NewNode(start, 0, NULL, size);
-	pNode tail = head.next, temp;
-	for (i = 0; i < bankSize; i++) {
-		if (strcmp(end, bank[i]) == 0) {
-			target = i;
-			break;
-		}
-	}
-	while (head.next != NULL) {
-		pNode node = get(&head);
-		if (node == NULL) {
-			break;
-		}
-		for (i = 0; i < bankSize; i++) {
-			if (node->mark[i] == 0) {
-				if (compare(node->str, bank[i]) == 1) {
-					if (i == target) {
-						if (node->cnt + 1 < min) {
-							min = node->cnt + 1;
-						}
-					}
-					else {
-						temp = NewNode(bank[i], node->cnt + 1, NULL, size);
-						tail = insert(&head, tail, temp);
-						memcpy(temp->mark, node->mark, size);
-						temp->mark[i] = 1;
-					}
-				}
-			}
-		}
-		free(node->mark);
-		free(node);
-	}
-	if (min < INT_MAX) {
-		return min;
-	}
-	return -1;
-}
-
-#define BANKSIZE 8
-
-int main()
-{
-	char start[9] = "AAAACCCC";
-	char end[9] = "CCCCCCCC";
-	char bank[BANKSIZE][9] = { "AAAACCCA","AAACCCCA","AACCCCCA","AACCCCCC","ACCCCCCC","CCCCCCCC","AAACCCCC","AACCCCCC" };
-	char **BANK = (char **)malloc(sizeof(char *) * BANKSIZE);
-	int i;
-	for (i = 0; i < BANKSIZE; i++) {
-		BANK[i] = (char *)malloc(sizeof(char) * 9);
-		memcpy(BANK[i], bank[i], 9);
-	}
-	printf("%d\n", minMutation(start, end, BANK, BANKSIZE));
-	system("pause");
+	if (dist[end_lab] <= bankSize)return dist[end_lab];
+	else return -1;
 }
