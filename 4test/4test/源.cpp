@@ -4,6 +4,7 @@
 int main()
 {
 	char element[] = "ABCDE";
+	char *p = nullptr;
 	int i0, i1, i2, i3, i4, i5;
 	i0 = 0;
 		for (i1 = 0; i1 < 5; i1++) {
