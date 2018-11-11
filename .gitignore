@@ -263,3 +263,4 @@ __pycache__/
 .vcxproj
 .vcxproj.filters
 *.exe
+*.o
