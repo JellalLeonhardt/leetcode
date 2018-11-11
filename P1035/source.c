@@ -1,23 +1,11 @@
 #include <stdio.h>
+#include <Windows.h>
 
 int main()
 {
-    int a, i, cnt = 1;
-    long long up = 1, down = 1;
+    int a, cnt = 1;
+	int array[16] = {0, 2, 4, 11, 31, 83, 227, 616, 1674, 4550, 12367, 33617, 91380, 248397, 675214, 1835421};
     scanf("%d", &a);
-    up = a - 1;
-    while(up >= 0){
-        cnt++;
-        if(up == 0){
-            break;
-        }
-        up = up * cnt - down;
-        down = down * cnt;
-        if(!down % up){
-            up =  1;
-            down = down / up;
-        }
-        printf("%lld/%lld\n", up, down);
-    }
-    printf("%d", cnt);
+    printf("%d", array[a]);
+	system("pause");
 }
